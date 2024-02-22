@@ -1,0 +1,7 @@
+POST http://localhost:3000/cats/new
+Content-Type: application/json
+
+{
+    name: "Lumi",
+    age: 2
+}
