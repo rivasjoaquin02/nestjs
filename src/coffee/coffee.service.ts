@@ -17,7 +17,7 @@ export class CoffeeService {
     }
 
     async findOne(id: string) {
-        const coffee = await this.coffeeRepository.findOne(id)
+        const coffee = await this.coffeeRepository.findOne({where: {id}})
         if (!coffee)
             throw new NotFoundException(`Coffee #${id} not found`)
         return coffee
@@ -30,7 +30,7 @@ export class CoffeeService {
 
     async update(id: string, updateCoffeeDto: UpdateCoffeeDto): Promise<Coffee> {
         const coffee = await this.coffeeRepository.preload({
-            id: +id,
+            id,
             ...updateCoffeeDto
         })
         if (!coffee) {
