@@ -1,71 +1,85 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { LoginUserDto } from './dto/login-user.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { UsersService } from 'src/users/users.service';
-import { User, UserToStore } from 'src/users/entities/user';
-import { JwtService } from '@nestjs/jwt';
-import { AuthResult } from './interfaces/auth-result';
-import * as bcrypt from 'bcrypt';
-import { JwtPayload } from './interfaces/jwt';
+import {
+	ConflictException,
+	Injectable,
+	NotFoundException,
+	UnauthorizedException
+} from "@nestjs/common";
+import { LoginUserDto } from "./dto/login-user.dto";
+import { RegisterUserDto } from "./dto/register-user.dto";
+import { UsersService } from "src/users/users.service";
+import { User, UserToStore } from "src/users/entities/user";
+import { JwtService } from "@nestjs/jwt";
+import { AuthResult } from "./interfaces/auth-result";
+import * as bcrypt from "bcrypt";
+import { JwtPayload } from "./interfaces/jwt";
 
 @Injectable()
 export class AuthService {
-    constructor( private readonly usersService: UsersService,
-        private readonly jwtService: JwtService
-    ) {}
+	constructor(
+		private readonly usersService: UsersService,
+		private readonly jwtService: JwtService
+	) {}
 
-    async login(user: LoginUserDto): Promise<AuthResult> {
-        const userInDb = user.email
-            ? await this.usersService.findByEmail(user.email)
-            : await this.usersService.findByUsername(user.username)
+	async login(user: LoginUserDto): Promise<AuthResult | undefined> {
+		const userInDb = user.email
+			? await this.usersService.findByEmail(user.email)
+			: await this.usersService.findByUsername(user.username);
 
-        if (!userInDb) throw new NotFoundException('The user does not exists')
+		if (!userInDb) throw new NotFoundException("The user does not exists");
 
-        const isMatch = await this.comparePassword(userInDb.password, user.password) 
-        if (!isMatch)  throw new UnauthorizedException('The password is incorrect')
-            
-        const {token} = this.createToken(userInDb)
-        return { user: userInDb, token }
-    }
+		const isMatch = await this.comparePassword(
+			user.password,
+			userInDb.password
+		);
+		if (!isMatch)
+			throw new UnauthorizedException("The password is incorrect");
 
-    async register(user: RegisterUserDto) : Promise<AuthResult> {
-        const isInDb = user.email
-            ? await this.usersService.findByEmail(user.email)
-            : await this.usersService.findByUsername(user.username)
+		const { token } = this.createToken(userInDb);
+		return { user: userInDb, token };
+	}
 
-        if (isInDb) throw new ConflictException('The user already exist')
+	async register(user: RegisterUserDto): Promise<AuthResult> {
+		const isInDb = await this.usersService.findByEmail(user.email);
+		if (isInDb) throw new ConflictException("The user already exist");
 
-        // hash pass
-        const hashedPassword = await this.hashPassword(user.password)
-        const userToStore: UserToStore = {...user, password: hashedPassword}
+		// hash pass
+		const hashedPassword = await this.hashPassword(user.password);
+		const userToStore: UserToStore = { ...user, password: hashedPassword };
 
-        // create user
-        const userInDb = await this.usersService.create(userToStore)
-        const {token} = this.createToken(userInDb)
-        return {user: userInDb, token}
-    }
+		// create user
+		const userInDb = await this.usersService.create(userToStore);
+		const { token } = this.createToken(userInDb);
+		return { user: userInDb, token };
+	}
 
-    async hashPassword(password: string):  Promise<string> {
-        const hashedPassword = await bcrypt.hash(password, 10)
-        return hashedPassword
-    }
+	async hashPassword(password: string): Promise<string> {
+		const hashedPassword = await bcrypt.hash(password, 10);
+		return hashedPassword;
+	}
 
-    async comparePassword(enteredPassword: string, passwordInDb: string): Promise<boolean> {
-        const match = await bcrypt.compare(enteredPassword, passwordInDb)
-        return match
-    }
+	async comparePassword(
+		enteredPassword: string,
+		passwordInDb: string
+	): Promise<boolean> {
+		const match = await bcrypt.compare(enteredPassword, passwordInDb);
+		return match;
+	}
 
-    createToken(user: User): {data: JwtPayload, token: string} {
-        const expiresIn = 30
-        const expiration = new Date()
-        expiration.setTime(expiration.getTime() + expiresIn * 1000)
+	createToken(user: User): { data: JwtPayload; token: string } {
+		const expiresIn = 30;
+		const expiration = new Date();
+		expiration.setTime(expiration.getTime() + expiresIn * 1000);
 
-        const data = {
-            userId: user.id,
-            username: user.username,
-            expiration
-        }
-        const jwt = this.jwtService.sign(data)
-        return {data, token: jwt}
-    }
+		const data = {
+			userId: user.id,
+			username: user.username,
+			expiration
+		};
+
+		// TODO: change this
+		//NOTE: gen secret with: openssl rand -base64 32
+		const SECRET = "wHad04rGT6sdA06/Ut4rR7kUXII+zBjoGra46PPF7Vs=";
+		const jwt = this.jwtService.sign(data, { secret: SECRET });
+		return { data, token: jwt };
+	}
 }

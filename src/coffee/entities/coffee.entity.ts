@@ -2,15 +2,15 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Coffee {
-    @PrimaryGeneratedColumn()
-    id: string;
+	@PrimaryGeneratedColumn()
+	id: string;
 
-    @Column()
-    name: string;
+	@Column()
+	name: string;
 
-    @Column()
-    brand: string;
+	@Column()
+	brand: string;
 
-    @Column('json', { nullable: true })
-    flavors: string[];
+	@Column("json", { nullable: true })
+	flavors: string[];
 }

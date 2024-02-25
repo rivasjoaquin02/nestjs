@@ -1,7 +1,5 @@
-
 export interface JwtPayload {
-    userId: string,
-    username: string
-    expiration: Date
+	userId: string;
+	username: string;
+	expiration: Date;
 }
-

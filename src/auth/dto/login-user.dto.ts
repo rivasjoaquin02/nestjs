@@ -1,13 +1,14 @@
-import { IsEmail, IsString } from "class-validator";
+import { IsEmail, IsOptional, IsString } from "class-validator";
 
 export class LoginUserDto {
-    @IsString()
-    username: string
+	@IsString()
+	username: string;
 
-    @IsString()
-    password: string
+	@IsString()
+	password: string;
 
-    @IsString()
-    @IsEmail()
-    email?: string
+	@IsString()
+	@IsEmail()
+	@IsOptional()
+	email?: string;
 }
