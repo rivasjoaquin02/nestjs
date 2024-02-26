@@ -7,11 +7,11 @@ import {
 import { LoginUserDto } from "./dto/login-user.dto";
 import { RegisterUserDto } from "./dto/register-user.dto";
 import { UsersService } from "src/users/users.service";
-import { User, UserToStore } from "src/users/entities/user";
 import { JwtService } from "@nestjs/jwt";
 import { AuthResult } from "./interfaces/auth-result";
 import * as bcrypt from "bcrypt";
 import { JwtPayload } from "./interfaces/jwt";
+import { User, UserToStore } from "src/users/entity/user.entity";
 
 @Injectable()
 export class AuthService {
@@ -76,10 +76,7 @@ export class AuthService {
 			expiration
 		};
 
-		// TODO: change this
-		//NOTE: gen secret with: openssl rand -base64 32
-		const SECRET = "wHad04rGT6sdA06/Ut4rR7kUXII+zBjoGra46PPF7Vs=";
-		const jwt = this.jwtService.sign(data, { secret: SECRET });
+		const jwt = this.jwtService.sign(data);
 		return { data, token: jwt };
 	}
 }

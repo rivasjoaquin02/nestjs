@@ -17,7 +17,6 @@ export class CoffeeController {
 
 	@Get()
 	async findAll() {
-		return "hola";
 		return await this.coffeeService.findAll();
 	}
 
@@ -29,7 +28,6 @@ export class CoffeeController {
 
 	@Post()
 	async create(@Body() createCoffeeDto: CreateCoffeeDto) {
-		console.log(createCoffeeDto instanceof CreateCoffeeDto);
 		return await this.coffeeService.create(createCoffeeDto);
 	}
 
