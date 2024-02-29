@@ -9,9 +9,9 @@ import { RegisterUserDto } from "./dto/register-user.dto";
 import { UsersService } from "src/users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { AuthResult } from "./interfaces/auth-result";
-import * as bcrypt from "bcrypt";
 import { JwtPayload } from "./interfaces/jwt";
 import { User, UserToStore } from "src/users/entity/user.entity";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class AuthService {
@@ -34,7 +34,7 @@ export class AuthService {
 		if (!isMatch)
 			throw new UnauthorizedException("The password is incorrect");
 
-		const { token } = this.createToken(userInDb);
+		const { token } = await this.createToken(userInDb);
 		return { user: userInDb, token };
 	}
 
@@ -48,7 +48,7 @@ export class AuthService {
 
 		// create user
 		const userInDb = await this.usersService.create(userToStore);
-		const { token } = this.createToken(userInDb);
+		const { token } = await this.createToken(userInDb);
 		return { user: userInDb, token };
 	}
 
@@ -65,18 +65,20 @@ export class AuthService {
 		return match;
 	}
 
-	createToken(user: User): { data: JwtPayload; token: string } {
+	async createToken(
+		user: User
+	): Promise<{ payload: JwtPayload; token: string }> {
 		const expiresIn = 30;
 		const expiration = new Date();
 		expiration.setTime(expiration.getTime() + expiresIn * 1000);
 
-		const data = {
-			userId: user.id,
+		const payload = {
+			sub: user.id,
 			username: user.username,
 			expiration
 		};
 
-		const jwt = this.jwtService.sign(data);
-		return { data, token: jwt };
+		const jwt = await this.jwtService.signAsync(payload);
+		return { payload, token: jwt };
 	}
 }

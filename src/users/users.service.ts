@@ -12,13 +12,16 @@ export class UsersService {
 
 	async findByEmail(email: string): Promise<User | undefined> {
 		const user = await this.userRepository.findOne({ where: { email } });
-		if (!user) return null;
 		return user;
 	}
 
 	async findByUsername(username: string): Promise<User | undefined> {
 		const user = await this.userRepository.findOne({ where: { username } });
-		if (!user) return null;
+		return user;
+	}
+
+	async findById(id: string): Promise<User | undefined> {
+		const user = await this.userRepository.findOne({ where: { id } });
 		return user;
 	}
 
