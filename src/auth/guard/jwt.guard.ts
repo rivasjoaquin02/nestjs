@@ -24,7 +24,7 @@ export class JwtGuard implements CanActivate {
 			});
 
 			// with this you can access it in a route handler
-			request["user"] = payload;
+			request["token"] = payload;
 		} catch {
 			throw new UnauthorizedException();
 		}

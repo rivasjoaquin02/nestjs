@@ -12,6 +12,7 @@ import { AuthResult } from "./interfaces/auth-result";
 import { JwtPayload } from "./interfaces/jwt";
 import { User, UserToStore } from "src/users/entity/user.entity";
 import * as bcrypt from "bcrypt";
+import { Role } from "./role.enum";
 
 @Injectable()
 export class AuthService {
@@ -47,6 +48,7 @@ export class AuthService {
 		const userToStore: UserToStore = {
 			...user,
 			password: hashedPassword,
+			role: Role.Guest,
 			permissions: []
 		};
 
@@ -79,7 +81,8 @@ export class AuthService {
 		const payload = {
 			sub: user.id,
 			username: user.username,
-			expiration
+			expiration,
+			role: user.role
 		};
 
 		const jwt = await this.jwtService.signAsync(payload);

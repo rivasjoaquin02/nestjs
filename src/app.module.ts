@@ -5,6 +5,7 @@ import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { DatabaseModule } from "./database/database.module";
 import { ConfigModule } from "@nestjs/config";
+import { AccessControlService } from './access-control/access-control.service';
 import * as Joi from "joi";
 
 @Module({
@@ -35,6 +36,6 @@ import * as Joi from "joi";
 		DatabaseModule
 	],
 	controllers: [AppController],
-	providers: []
+	providers: [AccessControlService]
 })
 export class AppModule {}
