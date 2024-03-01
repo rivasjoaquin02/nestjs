@@ -1,11 +1,9 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { CoffeeModule } from "./coffee/coffee.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
-import { CoffeeRatingModule } from "./coffee-rating/coffee-rating.module";
 import { DatabaseModule } from "./database/database.module";
 import { ConfigModule } from "@nestjs/config";
 
@@ -23,7 +21,6 @@ import * as Joi from "joi";
 		}),
 		AuthModule,
 		UsersModule,
-		CoffeeModule,
 		TypeOrmModule.forRoot({
 			type: "postgres",
 			host: process.env.DATABASE_HOST,
@@ -34,7 +31,6 @@ import * as Joi from "joi";
 			autoLoadEntities: true,
 			synchronize: true //for develp only
 		}),
-		CoffeeRatingModule,
 		DatabaseModule
 	],
 	controllers: [AppController],
