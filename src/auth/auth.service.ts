@@ -44,7 +44,11 @@ export class AuthService {
 
 		// hash pass
 		const hashedPassword = await this.hashPassword(user.password);
-		const userToStore: UserToStore = { ...user, password: hashedPassword };
+		const userToStore: UserToStore = {
+			...user,
+			password: hashedPassword,
+			permissions: []
+		};
 
 		// create user
 		const userInDb = await this.usersService.create(userToStore);

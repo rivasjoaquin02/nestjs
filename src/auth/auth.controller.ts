@@ -4,12 +4,14 @@ import {
 	Get,
 	Post,
 	UseGuards,
-	Request
+	Request,
+	UnauthorizedException
 } from "@nestjs/common";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { AuthService } from "./auth.service";
 import { RegisterUserDto } from "./dto/register-user.dto";
-import { AuthGuard } from "./auth.guard";
+import { User } from "src/users/entity/user.entity";
+import { JwtGuard } from "./guard/jwt.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -27,9 +29,27 @@ export class AuthController {
 		return result;
 	}
 
-	@UseGuards(AuthGuard)
+	@UseGuards(JwtGuard)
 	@Get("profile")
-	getProfile(@Request() req) {
-		return req.user;
+	getProfile(@Request() request) {
+		return request.user;
+	}
+
+	@Get("refreshToken")
+	@UseGuards(JwtGuard)
+	async refreshToken(@Request() request): Promise<string> {
+		const user: User = request.user;
+		if (!user)
+			throw new UnauthorizedException(
+				"Could not log-in with the provided credentials"
+			);
+
+		const result = await this.authService.createToken(user);
+		if (!result)
+			throw new UnauthorizedException(
+				"Could not log-in with the provided credentials"
+			);
+
+		return result.token;
 	}
 }

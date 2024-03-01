@@ -10,6 +10,11 @@ export class UsersService {
 		private readonly userRepository: Repository<User>
 	) {}
 
+	async getAll(): Promise<User[]> {
+		const users = await this.userRepository.find();
+		return users;
+	}
+
 	async findByEmail(email: string): Promise<User | undefined> {
 		const user = await this.userRepository.findOne({ where: { email } });
 		return user;
