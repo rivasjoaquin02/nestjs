@@ -6,6 +6,8 @@ import { UsersModule } from "./users/users.module";
 import { DatabaseModule } from "./database/database.module";
 import { ConfigModule } from "@nestjs/config";
 import * as Joi from "joi";
+import { GraphQLModule } from "@nestjs/graphql";
+import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 
 @Module({
 	imports: [
@@ -31,6 +33,10 @@ import * as Joi from "joi";
 			database: process.env.DATABASE_NAME,
 			autoLoadEntities: true,
 			synchronize: true //for develp only
+		}),
+		GraphQLModule.forRoot<ApolloDriverConfig>({
+			driver: ApolloDriver,
+			playground: true //for develp only
 		}),
 		DatabaseModule
 	],
