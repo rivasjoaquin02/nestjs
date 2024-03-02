@@ -19,8 +19,8 @@ export class User {
 	@Column({ type: "int8" })
 	age: number;
 
-	@Column({ type: "jsonb", default: [] })
-	role: Role[];
+	@Column({ type: "varchar", default: Role.Guest })
+	role: Role;
 
 	@Column({ type: "jsonb", default: [] })
 	permissions: string[];

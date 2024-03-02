@@ -11,8 +11,8 @@ export class UsersController {
 	constructor(private readonly userService: UsersService) {}
 
 	@Get()
-	@UseGuards([JwtGuard, RoleGuard])
 	@Roles(Role.Admin)
+	@UseGuards(JwtGuard, RoleGuard)
 	async getAll(): Promise<User[]> {
 		return this.userService.getAll();
 	}

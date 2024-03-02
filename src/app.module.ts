@@ -5,6 +5,7 @@ import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { DatabaseModule } from "./database/database.module";
 import { ConfigModule } from "@nestjs/config";
+import { AccessControlService } from './access-control/access-control.service';
 import * as Joi from "joi";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
@@ -41,6 +42,6 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 		DatabaseModule
 	],
 	controllers: [AppController],
-	providers: []
+	providers: [AccessControlService]
 })
 export class AppModule {}
