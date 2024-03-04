@@ -4,15 +4,16 @@ import {
 	NotFoundException,
 	UnauthorizedException
 } from "@nestjs/common";
-import { LoginUserDto } from "./dto/login-user.dto";
-import { RegisterUserDto } from "./dto/register-user.dto";
 import { UsersService } from "src/users/users.service";
 import { JwtService } from "@nestjs/jwt";
-import { AuthResult } from "./interfaces/auth-result";
 import { JwtPayload } from "./interfaces/jwt";
-import { User, UserToStore } from "src/users/entity/user.entity";
+import { User } from "src/users/entities/user.entity";
 import * as bcrypt from "bcrypt";
 import { Role } from "./role.enum";
+import { CreateUserInput } from "src/users/dto/create-user.input";
+import { LoginResult } from "./types/login-result.type";
+import { RegisterUserInput } from "./dto/register-user.input";
+import { LoginUserInput } from "./dto/login-user.input";
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,7 @@ export class AuthService {
 		private readonly jwtService: JwtService
 	) {}
 
-	async login(user: LoginUserDto): Promise<AuthResult | undefined> {
+	async login(user: LoginUserInput): Promise<LoginResult | undefined> {
 		const userInDb = user.email
 			? await this.usersService.findByEmail(user.email)
 			: await this.usersService.findByUsername(user.username);
@@ -39,13 +40,13 @@ export class AuthService {
 		return { user: userInDb, token };
 	}
 
-	async register(user: RegisterUserDto): Promise<AuthResult> {
+	async register(user: RegisterUserInput): Promise<LoginResult> {
 		const isInDb = await this.usersService.findByEmail(user.email);
 		if (isInDb) throw new ConflictException("The user already exist");
 
 		// hash pass
 		const hashedPassword = await this.hashPassword(user.password);
-		const userToStore: UserToStore = {
+		const userToStore: CreateUserInput = {
 			...user,
 			password: hashedPassword,
 			role: Role.Guest,
@@ -58,34 +59,33 @@ export class AuthService {
 		return { user: userInDb, token };
 	}
 
-	async hashPassword(password: string): Promise<string> {
-		const hashedPassword = await bcrypt.hash(password, 10);
-		return hashedPassword;
+	private hashPassword(password: string): Promise<string> {
+		return bcrypt.hash(password, 10);
 	}
 
-	async comparePassword(
+	private comparePassword(
 		enteredPassword: string,
 		passwordInDb: string
 	): Promise<boolean> {
-		const match = await bcrypt.compare(enteredPassword, passwordInDb);
-		return match;
+		return bcrypt.compare(enteredPassword, passwordInDb);
 	}
 
 	async createToken(
 		user: User
 	): Promise<{ payload: JwtPayload; token: string }> {
-		const expiresIn = 30;
+		const expiresIn = 30 * 60;
 		const expiration = new Date();
 		expiration.setTime(expiration.getTime() + expiresIn * 1000);
 
-		const payload = {
+		const payload: JwtPayload = {
 			sub: user.id,
 			username: user.username,
 			expiration,
-			role: user.role
+			role: user.role,
+			permissions: user.permissions
 		};
 
-		const jwt = await this.jwtService.signAsync(payload);
-		return { payload, token: jwt };
+		const token = await this.jwtService.signAsync(payload);
+		return { payload, token };
 	}
 }

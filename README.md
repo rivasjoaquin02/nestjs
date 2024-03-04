@@ -1,3 +1,5 @@
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
@@ -28,8 +30,12 @@
 
 ## Todos
 
-- [ ] Fix JwtService to be global
-- [ ] Implement Role Base Auth, Permisions, Rules
+- [ ] auth
+    - [x] register & login
+    - [x] Role Base Auth, 
+    - [ ] Permisions 
+    - [ ] Rules
+- [x] graphql
 
 ## Installation
 

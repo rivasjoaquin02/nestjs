@@ -19,7 +19,7 @@ export class RoleGuard implements CanActivate {
 		);
 		if (requiredRoles && requiredRoles.length === 0) return true;
 
-		const request = context.switchToHttp().getRequest();
+		const request = this.getRequest(context);
 		const token = request["token"] as JwtPayload;
 
 		return requiredRoles.some((role) =>
@@ -28,5 +28,10 @@ export class RoleGuard implements CanActivate {
 				currentRole: token.role
 			})
 		);
+	}
+
+	private getRequest(context: ExecutionContext) {
+		const request = context.switchToHttp().getRequest();
+		return request;
 	}
 }

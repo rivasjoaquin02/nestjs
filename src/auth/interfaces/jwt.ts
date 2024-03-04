@@ -5,4 +5,5 @@ export interface JwtPayload {
 	username: string;
 	expiration: Date;
 	role: Role;
+	permissions: string[];
 }

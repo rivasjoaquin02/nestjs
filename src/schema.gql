@@ -1,0 +1,74 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: String!
+  username: String!
+  password: String!
+  email: String!
+  age: Int!
+  role: Role!
+  permissions: [String!]!
+}
+
+"""Supported roles"""
+enum Role {
+  Admin
+  User
+  Guest
+}
+
+type LoginResult {
+  user: User!
+  token: String!
+}
+
+type Query {
+  login(user: LoginUserInput!): LoginResult!
+  findAllUsers: [User!]!
+  findUserById(id: String!): User!
+  findUserByEmail(email: String!): User!
+}
+
+input LoginUserInput {
+  username: String!
+  password: String!
+  email: String
+}
+
+type Mutation {
+  register(user: RegisterUserInput!): LoginResult!
+  addUser(user: CreateUserInput!): User!
+  removeUserById(id: String!): User!
+  updateUserById(user: UpdateUserInput!): User!
+}
+
+input RegisterUserInput {
+  id: String
+  username: String!
+  password: String!
+  email: String!
+  age: Int!
+  role: Role
+  permissions: String
+}
+
+input CreateUserInput {
+  username: String!
+  email: String!
+  password: String!
+  age: Int!
+  role: Role!
+  permissions: [String!]!
+}
+
+input UpdateUserInput {
+  id: String!
+  username: String
+  password: String
+  email: String
+  age: Int
+  role: Role
+  permissions: [String!]
+}

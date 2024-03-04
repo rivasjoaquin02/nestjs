@@ -1,5 +1,5 @@
 import { Controller, Get, UseGuards } from "@nestjs/common";
-import { User } from "./entity/user.entity";
+import { User } from "./entities/user.entity";
 import { UsersService } from "./users.service";
 import { Roles } from "src/auth/role.decorator";
 import { Role } from "src/auth/role.enum";
@@ -14,6 +14,6 @@ export class UsersController {
 	@Roles(Role.Admin)
 	@UseGuards(JwtGuard, RoleGuard)
 	async getAll(): Promise<User[]> {
-		return this.userService.getAll();
+		return this.userService.findAll();
 	}
 }

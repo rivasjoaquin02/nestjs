@@ -1,14 +1,14 @@
 import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { DatabaseModule } from "./database/database.module";
 import { ConfigModule } from "@nestjs/config";
-import { AccessControlService } from './access-control/access-control.service';
+import { AccessControlService } from "./access-control/access-control.service";
 import * as Joi from "joi";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
+import { join } from "path";
 
 @Module({
 	imports: [
@@ -37,11 +37,15 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 		}),
 		GraphQLModule.forRoot<ApolloDriverConfig>({
 			driver: ApolloDriver,
+			autoSchemaFile: join(process.cwd(), "src/schema.gql"),
+			//typePaths: ["./**/*.graphql"],
+			/* definitions: {
+				path: join(process.cwd(), "src/graphql.ts")
+			}, */
 			playground: true //for develp only
 		}),
 		DatabaseModule
 	],
-	controllers: [AppController],
 	providers: [AccessControlService]
 })
 export class AppModule {}
