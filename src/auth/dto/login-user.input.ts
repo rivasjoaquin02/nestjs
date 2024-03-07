@@ -7,8 +7,4 @@ export class LoginUserInput {
 
 	@Field(() => String)
 	password: string;
-
-	// TODO: extra checking
-	@Field(() => String, { nullable: true })
-	email: string;
 }

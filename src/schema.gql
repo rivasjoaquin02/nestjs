@@ -34,7 +34,6 @@ type Query {
 input LoginUserInput {
   username: String!
   password: String!
-  email: String
 }
 
 type Mutation {

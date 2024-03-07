@@ -1,5 +1,6 @@
 import {
 	ConflictException,
+	HttpException,
 	Injectable,
 	NotFoundException,
 	UnauthorizedException
@@ -14,6 +15,7 @@ import { CreateUserInput } from "src/users/dto/create-user.input";
 import { LoginResult } from "./types/login-result.type";
 import { RegisterUserInput } from "./dto/register-user.input";
 import { LoginUserInput } from "./dto/login-user.input";
+import { jwtConstants } from "./constants";
 
 @Injectable()
 export class AuthService {
@@ -23,16 +25,19 @@ export class AuthService {
 	) {}
 
 	async login(user: LoginUserInput): Promise<LoginResult | undefined> {
-		const userInDb = user.email
-			? await this.usersService.findByEmail(user.email)
-			: await this.usersService.findByUsername(user.username);
-
+		const userInDb = await this.usersService.findByUsername(user.username);
 		if (!userInDb) throw new NotFoundException("The user does not exists");
 
-		const isMatch = await this.comparePassword(
-			user.password,
-			userInDb.password
-		);
+		let isMatch: boolean;
+		try {
+			isMatch = await this.comparePassword(
+				user.password,
+				userInDb.password
+			);
+		} catch (err) {
+			throw new UnauthorizedException("The password is incorrect");
+		}
+
 		if (!isMatch)
 			throw new UnauthorizedException("The password is incorrect");
 
@@ -73,7 +78,7 @@ export class AuthService {
 	async createToken(
 		user: User
 	): Promise<{ payload: JwtPayload; token: string }> {
-		const expiresIn = 30 * 60;
+		const expiresIn = 3000 * 60;
 		const expiration = new Date();
 		expiration.setTime(expiration.getTime() + expiresIn * 1000);
 
@@ -85,7 +90,10 @@ export class AuthService {
 			permissions: user.permissions
 		};
 
-		const token = await this.jwtService.signAsync(payload);
+		const token = await this.jwtService.signAsync(payload, {
+			expiresIn,
+			secret: jwtConstants.secret
+		});
 		return { payload, token };
 	}
 }

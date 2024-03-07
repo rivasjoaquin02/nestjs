@@ -18,7 +18,7 @@ export class JwtGqlGuard implements CanActivate {
 		const request = this.getRequest(ctx);
 		const token = this.extractTokenFromHeader(request);
 
-		if (!token) throw new UnauthorizedException();
+		if (!token) throw new UnauthorizedException("token error");
 
 		try {
 			const payload = this.jwtService.verifyAsync(token, {
@@ -26,16 +26,14 @@ export class JwtGqlGuard implements CanActivate {
 			});
 
 			request["token"] = payload;
+			return true;
 		} catch (err) {
-			console.log(err);
-			return false;
+			throw new UnauthorizedException("jwt expired");
 		}
-		return false;
 	}
 
 	private extractTokenFromHeader(request: Request): string | undefined {
-		const [type, token] =
-			request.headers.authorization?.split(" ")[1] ?? [];
+		const [type, token] = request.headers.authorization?.split(" ") ?? [];
 		return type === "Bearer" ? token : undefined;
 	}
 

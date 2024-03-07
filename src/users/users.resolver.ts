@@ -5,13 +5,17 @@ import { CreateUserInput } from "./dto/create-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
 import { UseGuards } from "@nestjs/common";
 import { JwtGqlGuard } from "src/auth/guard/jwt-graphql.guard";
+import { Roles } from "src/auth/role.decorator";
+import { Role } from "src/auth/role.enum";
+import { RoleGqlGuard } from "src/auth/guard/role-graphql.guard";
 
 @Resolver(() => User)
 export class UsersResolver {
 	constructor(private readonly userService: UsersService) {}
 
 	@Query(() => [User], { name: "findAllUsers" })
-	@UseGuards(JwtGqlGuard)
+	@Roles(Role.Guest)
+	@UseGuards(JwtGqlGuard, RoleGqlGuard)
 	findAll() {
 		return this.userService.findAll();
 	}
